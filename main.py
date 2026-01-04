@@ -18,16 +18,25 @@ def main():
     AsteroidField.containers = updatable
     Shot.containers = (shots, updatable, drawable)
     asteroid_field = AsteroidField()
-    timer = 0
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    background = pygame.Surface(screen.get_size())
+    background = background.convert()
+    background.fill((0, 0, 0))
+
+    font = pygame.font.Font(None, 64)
+    text = font.render("Game over", True, (255, 255, 255))
+    textpos = text.get_rect(centerx=background.get_width() / 2, y = background.get_height() / 2)
+
     clock = pygame.time.Clock()
     x = SCREEN_WIDTH / 2
     y = SCREEN_HEIGHT / 2
     main_player = Player(x, y)
+    timer = 0
     dt = 0
     while True:
         if timer <= 60:
+            screen.blit(background, (0, 0))
             log_state()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -48,13 +57,13 @@ def main():
                         log_event("asteroid_shot")
                         shot.kill()
                         asteroid.split()
-            pygame.display.flip()
-            dt = clock.tick(60) / 1000
         else:
-            print(timer)
-            sys.exit()
+            screen.blit(background, (0, 0))
+            background.blit(text, textpos)
         timer += clock.get_time() / 1000
-        print()
+        dt = clock.tick(60) / 1000
+        pygame.display.flip()
+
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
