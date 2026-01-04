@@ -18,6 +18,7 @@ def main():
     AsteroidField.containers = updatable
     Shot.containers = (shots, updatable, drawable)
     asteroid_field = AsteroidField()
+    timer = 0
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
@@ -26,28 +27,34 @@ def main():
     main_player = Player(x, y)
     dt = 0
     while True:
-        log_state()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return
-        screen.fill("black")
-        for d in drawable:
-            d.draw(screen)
-        
-        updatable.update(dt)
-        for asteroid in asteroids:
-            if asteroid.collides_with(main_player):
-                log_event("player_hit")
-                print("Game over!")
-                sys.exit()
-        for asteroid in asteroids:
-            for shot in shots:
-                if asteroid.collides_with(shot):
-                    log_event("asteroid_shot")
-                    shot.kill()
-                    asteroid.split()
-        pygame.display.flip()
-        dt = clock.tick(60) / 1000
+        if timer <= 60:
+            log_state()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+            screen.fill("black")
+            for d in drawable:
+                d.draw(screen)
+
+            updatable.update(dt)
+            for asteroid in asteroids:
+                if asteroid.collides_with(main_player):
+                    log_event("player_hit")
+                    print("Game over!")
+                    sys.exit()
+            for asteroid in asteroids:
+                for shot in shots:
+                    if asteroid.collides_with(shot):
+                        log_event("asteroid_shot")
+                        shot.kill()
+                        asteroid.split()
+            pygame.display.flip()
+            dt = clock.tick(60) / 1000
+        else:
+            print(timer)
+            sys.exit()
+        timer += clock.get_time() / 1000
+        print()
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
