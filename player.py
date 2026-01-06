@@ -10,6 +10,9 @@ class Player(circleshape.CircleShape):
         self.rotation = 0
         self.cooldown = 0
         self.score = 0
+        self.health = MAX_HEALTH
+        self.game_over = False
+        self.invulnerability = False
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -25,7 +28,7 @@ class Player(circleshape.CircleShape):
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
 
-    
+
     def update(self, dt):
         keys = pygame.key.get_pressed()
         self.cooldown -= dt
