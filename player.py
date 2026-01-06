@@ -13,6 +13,7 @@ class Player(circleshape.CircleShape):
         self.health = MAX_HEALTH
         self.game_over = False
         self.invulnerability = False
+        self.speed = PLAYER_SPEED
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -38,17 +39,21 @@ class Player(circleshape.CircleShape):
             self.rotate(dt)
         elif keys[pygame.K_w]:
             self.move(dt)
+            self.speed += ACCELERATION_SPEED
         elif keys[pygame.K_s]:
-            self.move(-dt)
+            self.speed -= ACCELERATION_SPEED
         elif keys[pygame.K_SPACE]:
             self.shoot()
+        else:
+            self = PLAYER_SPEED
 
     def move(self, dt):
         unit_vector = pygame.Vector2(0, 1)
         rotated_vector = unit_vector.rotate(self.rotation)
-        rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
+        rotated_with_speed_vector = rotated_vector * self.speed * dt
         self.position += rotated_with_speed_vector
-    
+
+
     def shoot(self):
         if self.cooldown <= 0:
             self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS

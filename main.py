@@ -55,9 +55,7 @@ def main():
             for asteroid in asteroids:
                 if asteroid.collides_with(main_player) and time_hit_snap - 3 >= int(timer):
                     time_hit_snap = int(timer)
-                    print(time_hit_snap)
                     main_player.health -= 20
-                    print(main_player.health)
                     if main_player.health <= 0:
                         main_player.game_over = True
                         
