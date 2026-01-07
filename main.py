@@ -53,11 +53,8 @@ def main():
 
             updatable.update(dt)
             for asteroid in asteroids:
-                if asteroid.collides_with(main_player) and time_hit_snap - 3 >= int(timer):
-                    time_hit_snap = int(timer)
-                    main_player.health -= 20
-                    if main_player.health <= 0:
-                        main_player.game_over = True
+                if asteroid.collides_with(main_player):
+                    main_player.take_damage(asteroid)
                         
             for asteroid in asteroids:
                 for shot in shots:

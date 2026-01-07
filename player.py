@@ -12,8 +12,7 @@ class Player(circleshape.CircleShape):
         self.score = 0
         self.health = MAX_HEALTH
         self.game_over = False
-        self.invulnerability = False
-        self.speed = PLAYER_SPEED
+        self.invulnerability = 0.0
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -26,39 +25,44 @@ class Player(circleshape.CircleShape):
     def draw(self, screen):
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
 
-    def rotate(self, dt):
-        self.rotation += PLAYER_TURN_SPEED * dt
+    def rotate(self, keys, dt):
+        if keys[pygame.K_a]:
+            self.rotation += PLAYER_TURN_SPEED * dt
+        elif keys[pygame.K_d]:
+            self.rotation += PLAYER_TURN_SPEED * -dt
+
+
+    def take_damage(self, other):
+        if self.invulnerability <= 0:
+            self.invulnerability = PLAYER_INVULNERABILITY
+            self.health -= 1.2 * other.radius
+        if self.health <= 0:
+            self.game_over = True
+
 
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
         self.cooldown -= dt
-        if keys[pygame.K_a]:
-            self.rotate(-dt)
-        elif keys[pygame.K_d]:
-            self.rotate(dt)
-        elif keys[pygame.K_w]:
-            self.move(dt)
-            self.speed += ACCELERATION_SPEED
-        elif keys[pygame.K_s]:
-            self.speed -= ACCELERATION_SPEED
-        elif keys[pygame.K_SPACE]:
-            self.shoot()
-        else:
-            self = PLAYER_SPEED
+        self.invulnerability -= dt
+        self.movement(keys, dt)
+        self.rotate(keys, dt)
+        self.shoot(keys)
 
-    def move(self, dt):
-        unit_vector = pygame.Vector2(0, 1)
-        rotated_vector = unit_vector.rotate(self.rotation)
-        rotated_with_speed_vector = rotated_vector * self.speed * dt
-        self.position += rotated_with_speed_vector
+            
+    def movement(self, keys, dt):
+        if keys[pygame.K_w]:
+            unit_vector = pygame.Vector2(0, 1)
+            rotated_vector = unit_vector.rotate(self.rotation)
+            rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
+            self.position += rotated_with_speed_vector + self.velocity
 
 
-    def shoot(self):
-        if self.cooldown <= 0:
-            self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
-            shot = Shot(*self.position, SHOT_RADIUS)
-            shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
-            self.score += 1
+    def shoot(self, keys):
+        if keys[pygame.K_SPACE]:
+            if self.cooldown <= 0:
+                self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
+                shot = Shot(*self.position, SHOT_RADIUS)
+                shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
 
 
