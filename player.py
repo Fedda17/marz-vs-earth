@@ -1,5 +1,6 @@
 import pygame
 import circleshape
+import math
 from shot import Shot
 from constants import *
 
@@ -7,6 +8,8 @@ class Player(circleshape.CircleShape):
     
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
+        self.acceleration = pygame.Vector2(0, 0)
+        self.friction = .93
         self.rotation = 0
         self.cooldown = 0
         self.score = 0
@@ -24,13 +27,6 @@ class Player(circleshape.CircleShape):
 
     def draw(self, screen):
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
-
-    def rotate(self, keys, dt):
-        if keys[pygame.K_a]:
-            self.rotation += PLAYER_TURN_SPEED * dt
-        elif keys[pygame.K_d]:
-            self.rotation += PLAYER_TURN_SPEED * -dt
-
 
     def take_damage(self, other):
         if self.invulnerability <= 0:
@@ -51,11 +47,16 @@ class Player(circleshape.CircleShape):
 
             
     def movement(self, keys, dt):
+        unit_vector = pygame.Vector2(0, 1)
+        rotated_vector = unit_vector.rotate(self.rotation)
         if keys[pygame.K_w]:
-            unit_vector = pygame.Vector2(0, 1)
-            rotated_vector = unit_vector.rotate(self.rotation)
-            rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
-            self.position += rotated_with_speed_vector + self.velocity
+            self.acceleration += rotated_vector * PLAYER_THRUST
+            self.velocity += self.acceleration
+        else:
+            current_speed = math.hypot(self.velocity.x, self.velocity.y)
+            self.velocity = rotated_vector * current_speed
+        self.position +=  self.velocity * dt
+        self.velocity *= self.friction
 
 
     def shoot(self, keys):
@@ -66,3 +67,8 @@ class Player(circleshape.CircleShape):
                 shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
 
 
+    def rotate(self, keys, dt):
+        if keys[pygame.K_a]:
+            self.rotation += PLAYER_TURN_SPEED * dt
+        elif keys[pygame.K_d]:
+            self.rotation += PLAYER_TURN_SPEED * -dt
