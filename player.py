@@ -53,6 +53,7 @@ class Player(circleshape.CircleShape):
             self.acceleration += rotated_vector * PLAYER_THRUST
             self.velocity += self.acceleration
         else:
+            self.acceleration = pygame.Vector2(0,0)
             current_speed = math.hypot(self.velocity.x, self.velocity.y)
             self.velocity = rotated_vector * current_speed
         self.position +=  self.velocity * dt
